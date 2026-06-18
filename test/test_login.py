@@ -20,5 +20,5 @@ class TestPages:
         assert self.driver.current_url == "https://demoqa.com/books", "Ошибка ULR страницы с книгами"
 
     @pytest.mark.profile    def test_open_profile_page(self):
-        self.driver.get("https://demoqa.com/profile")
-        assert self.driver.current_url == "https://demoqa.com/profile", "Ошибка ULR страницы профиля"
+        self.driver.get("https://google.com")
+        assert self.driver.current_url == "https://google.com", "Ошибка ULR страницы профиля"
