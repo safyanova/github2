@@ -1,16 +1,24 @@
-services: # Описание микросервисов (контейнеров)
-  joke-app: # Имя контейнера (по умолчанию добавится -1)
-    image: api:v1 # Базовый образ для контейнера (если такого нет, соберется из докерфайла)
-    shm_size: 2g
-    build: # Инструкции для сборки образа, если он не найден
-      context: . # Контекст сборки (текущая директория)
-      dockerfile: Dockerfile # Имя Dockerfile
-    volumes: # Тома для монтирования
+services:
+  tests:
+    image: ui:v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
       - ./:/usr/workspace
-      - /dev/shm:/dev/shm # Монтируем разделяемую память хоста
-    command: /bin/sh -c "STAGE=$$STAGE pytest -o log_cli=true -m=$$SUITE --alluredir=report" # Команда для выполнения в контейнере
-    environment: # Переменные окружения
-      STAGE: ${STAGE:-dev}
-      SUITE: ${SUITE:-regression}
-      THREADS: ${THREADS:-4}
-    tty: true # Для цветного вывода логов
+    environment:
+      STAGE: ${STAGE}
+      MARKER: ${MARKER}
+      THREADS: ${THREADS}
+    command: /bin/sh -c "STAGE=$$STAGE pytest -sv -o log_cli=true -m=$$MARKER -n=$$THREADS --alluredir=allure-results"
+    tty: true
+
+  report:
+    image: ui:v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/usr/workspace
+    command: /bin/sh -c "ls -la && allure generate allure-results --clean -o allure-report"
+    working_dir: /usr/workspace
